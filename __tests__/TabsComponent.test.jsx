@@ -1,9 +1,10 @@
+
 import React from 'react';
 import { shallow } from 'enzyme';
-import TabsComponent from '../TabsComponent';
+import TabsComponent from '../src/components/TabsComponent';
 
 it('should render correctly with no props', () => {
-  const component = shallow(<TabsComponent/>);
+  const component = shallow(<TabsComponent />);
 
   expect(component).toMatchSnapshot();
 });

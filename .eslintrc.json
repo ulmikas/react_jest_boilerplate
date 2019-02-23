@@ -4,7 +4,6 @@
       "jest": true
     },
     "rules": {
-      "import/extensions": "off",
       "react/prefer-stateless-function": "off"
     }
 }
