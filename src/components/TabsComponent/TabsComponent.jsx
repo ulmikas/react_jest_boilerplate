@@ -8,21 +8,21 @@ import React, { Component } from 'react';
 class TabsComponent extends Component {
   render() {
     return (
-      <Tabs>
-        <TabList>
-          <Tab>Title 1</Tab>
-          <Tab>Title 2</Tab>
-          <Tab>Title 3</Tab>
+      <Tabs data-tabs="tabs">
+        <TabList data-tabs="tab-list">
+          <Tab><span data-tabs="tab">Title 1</span></Tab>
+          <Tab><span data-tabs="tab">Title 2</span></Tab>
         </TabList>
 
         <TabPanel>
-          <h2>Any content 1</h2>
+          <div data-tabs="tab-panel">
+            <h2>Any content 1</h2>
+          </div>
         </TabPanel>
         <TabPanel>
-          <h2>Any content 2</h2>
-        </TabPanel>
-        <TabPanel>
-          <h2>Any content 3</h2>
+          <div data-tabs="tab-panel">
+            <h2>Any content 2</h2>
+          </div>
         </TabPanel>
       </Tabs>
     );
