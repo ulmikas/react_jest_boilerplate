@@ -65,17 +65,17 @@ class TabsComponent extends Component {
   getIndexFromCoockies = () => parseInt(Cookies.get('activeTab'), 10);
 
   renderTabName = tab => (
-    <Tab data-tabs="tab" key={tab.id}>
-      <span data-tabs="tab-name">{tab.name}</span>
+    <Tab data-test="tab" key={tab.id}>
+      <span data-test="tab-name">{tab.name}</span>
       &nbsp;
-      <span data-tabs="remove-tab" onClick={event => this.handleCloseTab(event, tab.id)}>
+      <span data-test="remove-tab" onClick={event => this.handleCloseTab(event, tab.id)}>
         &times;
       </span>
     </Tab>
   );
 
   renderTabsContent = ({ id, content }) => (
-    <TabPanel data-tabs="tab-panel" key={id}>
+    <TabPanel data-test="tab-panel" key={id}>
       <div>{content}</div>
     </TabPanel>
   );
@@ -83,10 +83,10 @@ class TabsComponent extends Component {
   render() {
     const { tabs } = this.state;
     return (
-      <Tabs data-tabs="tabs" defaultIndex={this.getIndexFromCoockies()} onSelect={this.setCoockie}>
-        <TabList>
+      <Tabs data-test="tabs" defaultIndex={this.getIndexFromCoockies()} onSelect={this.setCoockie}>
+        <TabList data-test="tabs-list">
           {tabs.map(this.renderTabName)}
-          <span data-tabs="add-tab" onClick={this.handleAddTab}>
+          <span data-test="add-tab" onClick={this.handleAddTab}>
             Add
           </span>
         </TabList>
