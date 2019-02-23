@@ -9,10 +9,7 @@ describe('<App />', () => {
     const addTabButton = tree.find('[data-tabs="add-tab"]');
 
     addTabButton.simulate('click');
-    const newTabs = tree.find('li[data-tabs="tab"]');
-    const newTab = newTabs.at(tabs.length);
-
-    expect(newTab).toExist();
+    expect(tree).toContainMatchingElements(tabs.length + 1, 'li[data-tabs="tab"]');
   });
 
   it('remove tab', () => {
@@ -20,10 +17,10 @@ describe('<App />', () => {
     const tabs = tree.find('li[data-tabs="tab"]');
     const tabToRemove = tabs.at(1);
     const removeTab = tabToRemove.find('[data-tabs="remove-tab"]');
-    const removeTabId = tabToRemove.getDOMNode().id;
+
     removeTab.simulate('click');
 
-    expect(tree.find(`#${removeTabId}`)).toHaveLength(0);
+    expect(tabs.at(1).equals(tabToRemove)).toEqual(false);
   });
 
   it('set active tab', () => {
@@ -33,7 +30,9 @@ describe('<App />', () => {
 
     tabToBeActive.simulate('click');
     const tabsContent = tree.find('div[data-tabs="tab-panel"]').at(1);
+    const tabToBeActiveNew = tree.find('li[data-tabs="tab"]').at(1);
 
+    expect(tabToBeActiveNew).toMatchSelector('li[aria-selected="true"]');
     expect(tabsContent.children()).toExist();
   });
 });
