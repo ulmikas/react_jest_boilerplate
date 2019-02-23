@@ -2,10 +2,144 @@
 
 exports[`<App /> should render correctly tab 3 1`] = `
 <div
-  data-tabs="tab-panel"
+  class="react-tabs"
+  data-tabs="true"
 >
-  <h2>
-    Any content 1
-  </h2>
+  <ul
+    class="react-tabs__tab-list"
+    data-tabs="tab-list"
+    role="tablist"
+  >
+    <li
+      aria-controls="react-tabs-1"
+      aria-disabled="false"
+      aria-selected="true"
+      class="react-tabs__tab react-tabs__tab--selected"
+      id="react-tabs-0"
+      role="tab"
+      tabindex="0"
+    >
+      <span
+        data-tabs="tab"
+      >
+        Title 1
+      </span>
+       
+      <span>
+        ×
+      </span>
+    </li>
+    <li
+      aria-controls="react-tabs-3"
+      aria-disabled="false"
+      aria-selected="false"
+      class="react-tabs__tab"
+      id="react-tabs-2"
+      role="tab"
+    >
+      <span
+        data-tabs="tab"
+      >
+        Title 2
+      </span>
+       
+      <span>
+        ×
+      </span>
+    </li>
+    <span>
+      Add
+    </span>
+  </ul>
+  <div
+    aria-labelledby="react-tabs-0"
+    class="react-tabs__tab-panel react-tabs__tab-panel--selected"
+    id="react-tabs-1"
+    role="tabpanel"
+  >
+    <div
+      data-tabs="tab-panel"
+    >
+      Content 1
+    </div>
+  </div>
+  <div
+    aria-labelledby="react-tabs-2"
+    class="react-tabs__tab-panel"
+    id="react-tabs-3"
+    role="tabpanel"
+  />
+</div>
+`;
+
+exports[`<App /> should render correctly tab 3 2`] = `
+<div
+  class="react-tabs"
+  data-tabs="true"
+>
+  <ul
+    class="react-tabs__tab-list"
+    data-tabs="tab-list"
+    role="tablist"
+  >
+    <li
+      aria-controls="react-tabs-1"
+      aria-disabled="false"
+      aria-selected="true"
+      class="react-tabs__tab react-tabs__tab--selected"
+      id="react-tabs-0"
+      role="tab"
+      tabindex="0"
+    >
+      <span
+        data-tabs="tab"
+      >
+        Title 1
+      </span>
+       
+      <span>
+        ×
+      </span>
+    </li>
+    <li
+      aria-controls="react-tabs-3"
+      aria-disabled="false"
+      aria-selected="false"
+      class="react-tabs__tab"
+      id="react-tabs-2"
+      role="tab"
+    >
+      <span
+        data-tabs="tab"
+      >
+        Title 2
+      </span>
+       
+      <span>
+        ×
+      </span>
+    </li>
+    <span>
+      Add
+    </span>
+  </ul>
+  <div
+    aria-labelledby="react-tabs-0"
+    class="react-tabs__tab-panel react-tabs__tab-panel--selected"
+    id="react-tabs-1"
+    role="tabpanel"
+  >
+    <div
+      data-tabs="tab-panel"
+    >
+      Content 1
+    </div>
+  </div>
+  <div
+    aria-labelledby="react-tabs-2"
+    class="react-tabs__tab-panel"
+    id="react-tabs-3"
+    role="tabpanel"
+  />
 </div>
 `;
