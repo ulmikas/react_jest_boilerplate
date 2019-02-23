@@ -20,7 +20,7 @@ describe('<App />', () => {
 
     removeTab.simulate('click');
 
-    expect(tabs.at(1).equals(tabToRemove)).toEqual(false);
+    expect(tree).toContainMatchingElements(tabs.length - 1, 'li[data-tabs="tab"]');
   });
 
   it('set active tab', () => {
