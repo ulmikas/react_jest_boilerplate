@@ -10,8 +10,9 @@ describe('<App />', () => {
 
     addTabButton.simulate('click');
     const newTabs = tree.find('li[data-tabs="tab"]');
+    const newTab = newTabs.at(tabs.length);
 
-    expect(newTabs).toHaveLength(tabs.length + 1);
+    expect(newTab).toExist();
   });
 
   it('remove tab', () => {
