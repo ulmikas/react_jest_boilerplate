@@ -1,14 +1,10 @@
-import './App.css';
-
 import React, { Component } from 'react';
+import TabsComponent from '../TabsComponent';
+import './App.css';
 
 class App extends Component {
   render() {
-    return (
-      <div>
-        <h1>My React App!</h1>
-      </div>
-    );
+    return <TabsComponent />;
   }
 }
 

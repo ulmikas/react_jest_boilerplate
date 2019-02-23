@@ -12,7 +12,10 @@
     "setupFilesAfterEnv": [
       "jest-enzyme"
     ],
-    "testEnvironment": "enzyme"
+    "testEnvironment": "enzyme",
+    "moduleNameMapper": {
+      "\\.(css|less|sass|scss)$": "<rootDir>/__mocks__/styleMock.js"
+    }
   },
   "importSort": {
     ".js, .jsx": {
@@ -44,7 +47,7 @@
     "jest": "^24.1.0",
     "jest-environment-enzyme": "^7.0.1",
     "jest-enzyme": "^7.0.1",
-    "react-test-renderer": "^16.8.2",
+    "react-test-renderer": "^16.8.3",
     "style-loader": "^0.23.1",
     "webpack": "^4.29.5",
     "webpack-cli": "^3.2.3",
@@ -52,9 +55,11 @@
   },
   "dependencies": {
     "@types/jest": "^24.0.6",
+    "ignore-styles": "^5.0.1",
     "prettier": "^1.16.4",
     "prettier-eslint": "^8.8.2",
     "react": "^16.8.2",
-    "react-dom": "^16.8.2"
+    "react-dom": "^16.8.2",
+    "react-tabs": "^3.0.0"
   }
 }
