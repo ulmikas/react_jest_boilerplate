@@ -5,11 +5,10 @@ import App from '../src/components/App';
 describe('<App />', () => {
   it('adds tab', () => {
     const tree = mount(<App />);
-    const tabs = tree.find('li[data-tabs="tab"]');
     const addTabButton = tree.find('[data-tabs="add-tab"]');
 
     addTabButton.simulate('click');
-    expect(tree).toContainMatchingElements(tabs.length + 1, 'li[data-tabs="tab"]');
+    expect(tree).toContainMatchingElements(3, 'li[data-tabs="tab"]');
   });
 
   it('remove tab', () => {
@@ -20,7 +19,7 @@ describe('<App />', () => {
 
     removeTab.simulate('click');
 
-    expect(tree).toContainMatchingElements(tabs.length - 1, 'li[data-tabs="tab"]');
+    expect(tree).toContainMatchingElements(1, 'li[data-tabs="tab"]');
   });
 
   it('set active tab', () => {
