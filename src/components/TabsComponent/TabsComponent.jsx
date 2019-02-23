@@ -26,8 +26,6 @@ class TabsComponent extends Component {
   handleCloseTab = (event, id) => {
     const { tabs } = this.state;
 
-    debug('tabs ', tabs);
-
     this.setState({
       tabs: tabs.filter(tab => tab.id !== id),
     });
@@ -45,16 +43,16 @@ class TabsComponent extends Component {
   };
 
   renderTabName = tab => (
-    <Tab key={tab.id}>
-      <span data-tabs="tab">{tab.name}</span>
+    <Tab data-tabs="tab" key={tab.id}>
+      <span data-tabs="tab-name">{tab.name}</span>
       &nbsp;
-      <span onClick={event => this.handleCloseTab(event, tab.id)}>&times;</span>
+      <span data-tabs="remove-tab" onClick={event => this.handleCloseTab(event, tab.id)}>&times;</span>
     </Tab>
   );
 
   renderTabsContent = ({id, content}) => (
-    <TabPanel key={id}>
-      <div data-tabs="tab-panel">{content}</div>
+    <TabPanel data-tabs="tab-panel" key={id}>
+      <div>{content}</div>
     </TabPanel>
   );
 
@@ -64,7 +62,7 @@ class TabsComponent extends Component {
       <Tabs data-tabs="tabs">
       <TabList>
         {tabs.map(this.renderTabName)}
-        <span onClick={this.handleAddTab}>Add</span>
+        <span data-tabs="add-tab" onClick={this.handleAddTab}>Add</span>
       </TabList>
 
         {tabs.map(this.renderTabsContent)}
