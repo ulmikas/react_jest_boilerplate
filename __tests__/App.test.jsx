@@ -43,6 +43,7 @@ describe('<App />', () => {
 
     const host = 'https://cors-anywhere.herokuapp.com/';
     const url = 'http://test.com';
+    nock.disableNetConnect();
     nock(host)
       .get(`/${url}`)
       .reply(200, getFeedItems);
