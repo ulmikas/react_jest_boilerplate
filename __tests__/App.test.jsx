@@ -57,14 +57,16 @@ describe('<App />', () => {
   });
 
   it('check that active tab sets from coockies', () => {
-    Cookie.get = jest.fn().mockImplementation(() => '2');
+    const TAB_INDEX = 4;
+    Cookie.get = jest.fn().mockImplementation(() => TAB_INDEX);
+    Cookie.set = jest.fn().mockImplementation(i => i);
     const tree = mount(<App />);
     const tObj = treeObject(tree);
-    const tabToBeActive = tObj.getNthTab(2);
+    const tabToBeActive = tObj.getNthTab(TAB_INDEX);
     tabToBeActive.simulate('click');
     const newTree = mount(<App />);
     const tObj2 = treeObject(newTree);
-    const tab = tObj2.getNthTab(2);
+    const tab = tObj2.getNthTab(TAB_INDEX);
 
     expect(tab).toHaveProp('aria-selected', 'true');
   });
