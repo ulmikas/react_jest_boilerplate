@@ -41,6 +41,7 @@ class TabsComponent extends Component {
     modalIsOpen: false,
     loading: false,
     rssLink: '',
+    error: false,
   };
 
   handleOpenModal = () => {
@@ -48,7 +49,7 @@ class TabsComponent extends Component {
   };
 
   handleCloseModal = () => {
-    this.setState({ modalIsOpen: false });
+    this.setState({ modalIsOpen: false, error: false, loading: false });
   };
 
   handleCloseTab = (event, id) => {
@@ -59,16 +60,10 @@ class TabsComponent extends Component {
     });
   };
 
-  handleAddTab = () => {
-    const { tabs } = this.state;
-    this.handleOpenModal();
-  };
-
   handleSubmitForm = event => {
     event.preventDefault();
     this.hanldeStartLoading();
     this.createTab(this.state.rssLink);
-    this.handleCloseModal();
   };
 
   hanldeStartLoading = () => {
@@ -80,13 +75,21 @@ class TabsComponent extends Component {
   };
 
   createTab = async url => {
-    const tab = {
-      name: url,
-      content: await getRssContent(url),
-      id: uuid(),
-    };
-    this.addTab(tab);
-    this.hanldeStopLoading();
+    const content = await getRssContent(url);
+
+    if (content.error) {
+      this.setState({ error: true });
+    } else {
+      this.setState({ error: false });
+      const tab = {
+        name: url,
+        content: content,
+        id: uuid(),
+      };
+      this.addTab(tab);
+      this.hanldeStopLoading();
+      this.handleCloseModal();
+    }
   };
 
   addTab = tab => {
@@ -95,11 +98,7 @@ class TabsComponent extends Component {
     });
   };
 
-  // getRssContent = async url => {
-  //   let parser = new Parser();
-  //   const feed = await parser.parseURL(`${CORS_PROXY}${url}`);
-  //   return feed.items.map(item => item.title);
-  // };
+  renderErrorMsg = msg => <div>{msg}</div>;
 
   renderModal = () => {
     return (
@@ -117,7 +116,9 @@ class TabsComponent extends Component {
               data-test="rss-input"
               name="rss"
               value={this.state.rssLink}
-              onChange={e => {this.setState({ rssLink: e.target.value })}}
+              onChange={e => {
+                this.setState({ rssLink: e.target.value });
+              }}
               type="url"
               required
             />
@@ -125,6 +126,8 @@ class TabsComponent extends Component {
               Создать
             </button>
           </form>
+
+          {this.state.error && this.renderErrorMsg('Не удалось загрузить данные')}
         </div>
       </Modal>
     );
@@ -163,7 +166,11 @@ class TabsComponent extends Component {
         >
           <TabList data-test="tabs-list">
             {tabs.map(this.renderTabName)}
-            <button data-test="add-tab" onClick={this.handleAddTab} disabled={this.state.loading}>
+            <button
+              data-test="add-tab"
+              onClick={this.handleOpenModal}
+              disabled={this.state.loading}
+            >
               Add
             </button>
           </TabList>
