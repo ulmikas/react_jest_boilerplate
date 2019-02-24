@@ -1,14 +1,15 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import Coockies from 'js-cookie';
+import Cookie from 'js-cookie';
 import App from '../src/components/App';
+
+jest.mock('js-cookie');
+
 
 const TABS_SELECTOR = 'ul[data-test="tabs-list"]';
 const TAB_SELECTOR = 'li[data-test="tab"]';
 const REMOVE_TAB_SELECTOR = '[data-test="remove-tab"]';
 const ADD_TAB_SELECTOR = '[data-test="add-tab"]';
-const SELECTED_TAB = '[aria-selected="true"]';
-const UNSELECTED_TAB = '[aria-selected="false"]';
 
 const treeObject = tree => ({
   getTabsContainer: () => tree.find(TABS_SELECTOR),
@@ -25,8 +26,8 @@ describe('<App />', () => {
     const tree = mount(<App />);
     const tObj = treeObject(tree);
     const addTabButton = tObj.getAddButton();
-
     addTabButton.simulate('click');
+
     expect(tree).toContainMatchingElements(6, TAB_SELECTOR);
   });
 
@@ -49,18 +50,18 @@ describe('<App />', () => {
     const tree = mount(<App />);
     const tObj = treeObject(tree);
     const tabToBeActive = tObj.getNthTab(1);
-
     tabToBeActive.simulate('click');
-    // const tabsAfter = tObj.getTabsList();
 
-    expect(tObj.getNthTab(0)).toMatchSelector(UNSELECTED_TAB);
-    expect(tObj.getNthTab(1)).toMatchSelector(SELECTED_TAB);
+    expect(tObj.getNthTab(0)).toHaveProp('aria-selected', 'false');
+    expect(tObj.getNthTab(1)).toHaveProp('aria-selected', 'true');
   });
 
-  it('check that active tab sets from coockies', () => {
-    const tree = mount(<App />);
-    const tObj = treeObject(tree);
-    const getIndexFromCoockies = jest.fn(() => Coockies.get('activeTab'));
-    expect(tObj.getNthTab(getIndexFromCoockies())).toMatchSelector(SELECTED_TAB);
-  });
+  // it('check that active tab sets from coockies', () => {
+  //   const tree = mount(<App />);
+  //   const tObj = treeObject(tree);
+  //   Cookie.get.setMockImplementation(() => '2');
+  //   // const getIndexFromCoockies = jest.fn(() => Coockies.get('activeTab'));
+
+  //   expect(tObj.getNthTab(2)).toMatchSelector(SELECTED_TAB);
+  // });
 });
