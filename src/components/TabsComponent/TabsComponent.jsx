@@ -5,10 +5,7 @@ import uuid from 'uuid';
 import debug from 'debug';
 import Cookies from 'js-cookie';
 import Modal from 'react-modal';
-import axios from 'axios';
-import Parser from 'rss-parser';
-
-const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+import { getRssContent } from '../../utils/rssUtils';
 
 const TABS = [
   {
@@ -43,6 +40,7 @@ class TabsComponent extends Component {
     tabs: TABS,
     modalIsOpen: false,
     loading: false,
+    rssLink: '',
   };
 
   handleOpenModal = () => {
@@ -68,9 +66,8 @@ class TabsComponent extends Component {
 
   handleSubmitForm = event => {
     event.preventDefault();
-    const data = new FormData(event.target);
     this.hanldeStartLoading();
-    this.createTab(data.get('rss'));
+    this.createTab(this.state.rssLink);
     this.handleCloseModal();
   };
 
@@ -85,7 +82,7 @@ class TabsComponent extends Component {
   createTab = async url => {
     const tab = {
       name: url,
-      content: await this.getRssContent(url),
+      content: await getRssContent(url),
       id: uuid(),
     };
     this.addTab(tab);
@@ -98,11 +95,11 @@ class TabsComponent extends Component {
     });
   };
 
-  getRssContent = async url => {
-    let parser = new Parser();
-    const feed = await parser.parseURL(`${CORS_PROXY}${url}`);
-    return feed.items.map(item => item.title);
-  };
+  // getRssContent = async url => {
+  //   let parser = new Parser();
+  //   const feed = await parser.parseURL(`${CORS_PROXY}${url}`);
+  //   return feed.items.map(item => item.title);
+  // };
 
   renderModal = () => {
     return (
@@ -110,13 +107,25 @@ class TabsComponent extends Component {
         isOpen={this.state.modalIsOpen}
         onRequestClose={this.handleCloseModal}
         contentLabel="Веедите rss"
+        ariaHideApp={false}
       >
-        <button onClick={this.handleCloseModal}>close</button>
-        <div>I am a modal</div>
-        <form onSubmit={this.handleSubmitForm}>
-          <input name="rss" type="url" required />
-          <button type="submit">Создать</button>
-        </form>
+        <div data-test="modal">
+          <button onClick={this.handleCloseModal}>close</button>
+          <div>Введите урл RSS</div>
+          <form data-test="rss-form" onSubmit={this.handleSubmitForm}>
+            <input
+              data-test="rss-input"
+              name="rss"
+              value={this.state.rssLink}
+              onChange={e => {this.setState({ rssLink: e.target.value })}}
+              type="url"
+              required
+            />
+            <button data-test="modal-submit" type="submit">
+              Создать
+            </button>
+          </form>
+        </div>
       </Modal>
     );
   };

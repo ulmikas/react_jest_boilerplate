@@ -1,34 +1,68 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import Cookie from 'js-cookie';
+import nock from 'nock';
+import delay from 'delay';
+import getFeedItems from '../__fixtures__/getFeedItems';
+
 import App from '../src/components/App';
 
 jest.mock('js-cookie');
 
-
 const TABS_SELECTOR = 'ul[data-test="tabs-list"]';
 const TAB_SELECTOR = 'li[data-test="tab"]';
+const TAB_CONTENT_SELECTOR = 'div[data-test="tab-panel"]';
 const REMOVE_TAB_SELECTOR = '[data-test="remove-tab"]';
 const ADD_TAB_SELECTOR = '[data-test="add-tab"]';
+const MODAL_SELECTOR = '[data-test="modal"]';
+const MODAL_SUBMIT_SELECTOR = '[data-test="modal-submit"]';
+const RSS_INPUT = '[data-test="rss-input"]';
+const RSS_FORM = '[data-test="rss-form"]';
 
 const treeObject = tree => ({
   getTabsContainer: () => tree.find(TABS_SELECTOR),
   getTabsList: () => tree.find(TAB_SELECTOR),
-  getLastAnchor: () => tree.find(TAB_SELECTOR).last(),
   getNthTab: n => tree.find(TAB_SELECTOR).at(n),
+  getLastTab: () => tree.find(TAB_SELECTOR).last(),
+  getLastTabContent: () => tree.find(TAB_CONTENT_SELECTOR).last(),
   getRemoveButton: tab => tab.find(REMOVE_TAB_SELECTOR),
   getAddButton: () => tree.find(ADD_TAB_SELECTOR),
+  getModal: () => tree.find(MODAL_SELECTOR),
+  getModalSubmit: () => tree.find(MODAL_SUBMIT_SELECTOR),
+  getRssInput: () => tree.find(RSS_INPUT),
+  getRssForm: () => tree.find(RSS_FORM),
   reloadApp: () => tree.unmount().mount(),
 });
 
 describe('<App />', () => {
-  it('adds tab', () => {
+  it('adds tab', async () => {
+    const host = 'https://cors-anywhere.herokuapp.com/';
+    const url = 'http://test.com';
+    nock(host)
+      .get(`/${url}`)
+      .reply(200, getFeedItems);
+
     const tree = mount(<App />);
     const tObj = treeObject(tree);
+    const tabsBeforeCreate = tObj.getTabsContainer();
     const addTabButton = tObj.getAddButton();
-    addTabButton.simulate('click');
 
-    expect(tree).toContainMatchingElements(6, TAB_SELECTOR);
+    expect(tabsBeforeCreate).toContainMatchingElements(5, TAB_SELECTOR);
+
+    addTabButton.simulate('click');
+    const inputLink = tObj.getRssInput();
+    inputLink.simulate('change', { target: { value: url } });
+    const form = tObj.getRssForm();
+    form.simulate('submit');
+    await delay(100);
+    tree.update();
+    const tabsAfterCreate = tObj.getTabsContainer();
+    const lastTab = tObj.getLastTab();
+    lastTab.simulate('click');
+    const lastTabContent = tObj.getLastTabContent();
+
+    expect(tabsAfterCreate).toContainMatchingElements(6, TAB_SELECTOR);
+    expect(lastTabContent).toHaveText('Загоризонтный Дятел: недолгая история объекта «Чернобыль-2»');
   });
 
   it('remove tab', () => {
@@ -58,16 +92,33 @@ describe('<App />', () => {
 
   it('check that active tab sets from coockies', () => {
     const TAB_INDEX = 4;
-    Cookie.get = jest.fn().mockImplementation(() => TAB_INDEX);
-    Cookie.set = jest.fn().mockImplementation(i => i);
+
+    function CookieContainer() {
+      let selectedTab = TAB_INDEX;
+      return {
+        get() {
+          return selectedTab;
+        },
+        set(i) {
+          selectedTab = i;
+        },
+      };
+    }
+    const cooks = CookieContainer();
+    Cookie.set.mockImplementation((_, i) => cooks.set(i));
+    Cookie.get.mockImplementation(() => cooks.get());
+
     const tree = mount(<App />);
     const tObj = treeObject(tree);
-    const tabToBeActive = tObj.getNthTab(TAB_INDEX);
-    tabToBeActive.simulate('click');
+
+    expect(cooks.get()).toEqual(TAB_INDEX);
+    expect(tObj.getNthTab(TAB_INDEX)).toHaveProp('aria-selected', 'true');
+    tObj.getNthTab(TAB_INDEX - 1).simulate('click');
+
     const newTree = mount(<App />);
     const tObj2 = treeObject(newTree);
-    const tab = tObj2.getNthTab(TAB_INDEX);
 
-    expect(tab).toHaveProp('aria-selected', 'true');
+    expect(cooks.get()).toEqual(TAB_INDEX - 1);
+    expect(tObj2.getNthTab(TAB_INDEX - 1)).toHaveProp('aria-selected', 'true');
   });
 });
