@@ -56,12 +56,16 @@ describe('<App />', () => {
     expect(tObj.getNthTab(1)).toHaveProp('aria-selected', 'true');
   });
 
-  // it('check that active tab sets from coockies', () => {
-  //   const tree = mount(<App />);
-  //   const tObj = treeObject(tree);
-  //   Cookie.get.setMockImplementation(() => '2');
-  //   // const getIndexFromCoockies = jest.fn(() => Coockies.get('activeTab'));
+  it('check that active tab sets from coockies', () => {
+    Cookie.get = jest.fn().mockImplementation(() => '2');
+    const tree = mount(<App />);
+    const tObj = treeObject(tree);
+    const tabToBeActive = tObj.getNthTab(2);
+    tabToBeActive.simulate('click');
+    const newTree = mount(<App />);
+    const tObj2 = treeObject(newTree);
+    const tab = tObj2.getNthTab(2);
 
-  //   expect(tObj.getNthTab(2)).toMatchSelector(SELECTED_TAB);
-  // });
+    expect(tab).toHaveProp('aria-selected', 'true');
+  });
 });
