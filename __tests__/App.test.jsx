@@ -3,6 +3,7 @@ import { mount } from 'enzyme';
 import Cookie from 'js-cookie';
 import nock from 'nock';
 import delay from 'delay';
+import Parser from 'rss-parser';
 import getFeedItems from '../__fixtures__/getFeedItems';
 
 import App from '../src/components/App';
@@ -19,7 +20,7 @@ const MODAL_SUBMIT_SELECTOR = '[data-test="modal-submit"]';
 const RSS_INPUT = '[data-test="rss-input"]';
 const RSS_FORM = '[data-test="rss-form"]';
 
-const treeObject = tree => ({
+const createSelector = tree => ({
   getTabsContainer: () => tree.find(TABS_SELECTOR),
   getTabsList: () => tree.find(TAB_SELECTOR),
   getNthTab: n => tree.find(TAB_SELECTOR).at(n),
@@ -36,6 +37,10 @@ const treeObject = tree => ({
 
 describe('<App />', () => {
   it('adds tab', async () => {
+    const parser = new Parser();
+    const feed = await parser.parseString(getFeedItems);
+    const firstItemTitle = feed.items[0].title;
+
     const host = 'https://cors-anywhere.herokuapp.com/';
     const url = 'http://test.com';
     nock(host)
@@ -43,7 +48,7 @@ describe('<App />', () => {
       .reply(200, getFeedItems);
 
     const tree = mount(<App />);
-    const tObj = treeObject(tree);
+    const tObj = createSelector(tree);
     const tabsBeforeCreate = tObj.getTabsContainer();
     const addTabButton = tObj.getAddButton();
 
@@ -62,12 +67,12 @@ describe('<App />', () => {
     const lastTabContent = tObj.getLastTabContent();
 
     expect(tabsAfterCreate).toContainMatchingElements(6, TAB_SELECTOR);
-    expect(lastTabContent).toHaveText('Загоризонтный Дятел: недолгая история объекта «Чернобыль-2»');
+    expect(lastTabContent).toHaveText(firstItemTitle);
   });
 
   it('remove tab', () => {
     const tree = mount(<App />);
-    const tObj = treeObject(tree);
+    const tObj = createSelector(tree);
     const tabListBefore = tObj.getTabsContainer();
     const tabToRemove = tObj.getNthTab(1);
     const removeTab = tObj.getRemoveButton(tabToRemove);
@@ -82,7 +87,7 @@ describe('<App />', () => {
 
   it('set active tab', () => {
     const tree = mount(<App />);
-    const tObj = treeObject(tree);
+    const tObj = createSelector(tree);
     const tabToBeActive = tObj.getNthTab(1);
     tabToBeActive.simulate('click');
 
@@ -109,14 +114,14 @@ describe('<App />', () => {
     Cookie.get.mockImplementation(() => cooks.get());
 
     const tree = mount(<App />);
-    const tObj = treeObject(tree);
+    const tObj = createSelector(tree);
 
     expect(cooks.get()).toEqual(TAB_INDEX);
     expect(tObj.getNthTab(TAB_INDEX)).toHaveProp('aria-selected', 'true');
     tObj.getNthTab(TAB_INDEX - 1).simulate('click');
 
     const newTree = mount(<App />);
-    const tObj2 = treeObject(newTree);
+    const tObj2 = createSelector(newTree);
 
     expect(cooks.get()).toEqual(TAB_INDEX - 1);
     expect(tObj2.getNthTab(TAB_INDEX - 1)).toHaveProp('aria-selected', 'true');
