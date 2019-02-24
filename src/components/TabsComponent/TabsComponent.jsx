@@ -1,11 +1,14 @@
+import React, { Component } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import uuid from 'uuid';
 import debug from 'debug';
 import Cookies from 'js-cookie';
 import Modal from 'react-modal';
+import axios from 'axios';
+import Parser from 'rss-parser';
 
-import React, { Component } from 'react';
+const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
 
 const TABS = [
   {
@@ -39,15 +42,16 @@ class TabsComponent extends Component {
   state = {
     tabs: TABS,
     modalIsOpen: false,
+    loading: false,
   };
 
   handleOpenModal = () => {
-    this.setState({modalIsOpen: true});
-  }
+    this.setState({ modalIsOpen: true });
+  };
 
   handleCloseModal = () => {
-    this.setState({modalIsOpen: false});
-  }
+    this.setState({ modalIsOpen: false });
+  };
 
   handleCloseTab = (event, id) => {
     const { tabs } = this.state;
@@ -59,43 +63,45 @@ class TabsComponent extends Component {
 
   handleAddTab = () => {
     const { tabs } = this.state;
-    // this.handleOpenModal();
+    this.handleOpenModal();
+  };
 
+  handleSubmitForm = event => {
+    event.preventDefault();
+    const data = new FormData(event.target);
+    this.hanldeStartLoading();
+    this.createTab(data.get('rss'));
+    this.handleCloseModal();
+  };
+
+  hanldeStartLoading = () => {
+    this.setState({ loading: true });
+  };
+
+  hanldeStopLoading = () => {
+    this.setState({ loading: false });
+  };
+
+  createTab = async url => {
+    const tab = {
+      name: url,
+      content: await this.getRssContent(url),
+      id: uuid(),
+    };
+    this.addTab(tab);
+    this.hanldeStopLoading();
+  };
+
+  addTab = tab => {
     this.setState({
-      tabs: [
-        ...tabs,
-        { name: `Title ${tabs.length + 1}`, content: `Content ${tabs.length + 1}`, id: uuid() },
-      ],
+      tabs: [...this.state.tabs, tab],
     });
   };
 
-  handleSubmitForm = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.target);
-    this.createTab(data.get('rss'));
-    // console.log('!!', data.get('rss'));
-  };
-
-  // getRssContent = async (url) => {
-  //   const res = await axios.get(url);
-  //   let { data } = await res.data;
-  //   console.log(data);
-  //   // return res.data;
-  // }
-
-//   getUsers = async () => {
-//     let res = await axios.get("https://reqres.in/api/users?page=1");
-//     let { data } = await res.data;
-//     this.setState({ users: data });
-// };
-
-  createTab = (url) => {
-    const tab = {
-      name: url,
-      content: this.getRssContent(),
-      id: uuid(),
-    }
-    console.log(tab.content);
+  getRssContent = async url => {
+    let parser = new Parser();
+    const feed = await parser.parseURL(`${CORS_PROXY}${url}`);
+    return feed.items.map(item => item.title);
   };
 
   renderModal = () => {
@@ -112,18 +118,14 @@ class TabsComponent extends Component {
           <button type="submit">Создать</button>
         </form>
       </Modal>
-    )
-  }
+    );
+  };
 
   setCoockie = index => {
     Cookies.set('activeTab', index);
   };
 
   getIndexFromCoockies = () => parseInt(Cookies.get('activeTab'), 10);
-
-  renderNewTab = () => {
-
-  }
 
   renderTabName = tab => (
     <Tab data-test="tab" key={tab.id}>
@@ -137,7 +139,7 @@ class TabsComponent extends Component {
 
   renderTabsContent = ({ id, content }) => (
     <TabPanel data-test="tab-panel" key={id}>
-      <div>{content}</div>
+      <div>{Array.isArray(content) ? content.map(item => <p key={item}>{item}</p>) : content}</div>
     </TabPanel>
   );
 
@@ -145,12 +147,16 @@ class TabsComponent extends Component {
     const { tabs } = this.state;
     return (
       <div>
-        <Tabs data-test="tabs" defaultIndex={this.getIndexFromCoockies()} onSelect={this.setCoockie}>
+        <Tabs
+          data-test="tabs"
+          defaultIndex={this.getIndexFromCoockies()}
+          onSelect={this.setCoockie}
+        >
           <TabList data-test="tabs-list">
             {tabs.map(this.renderTabName)}
-            <span data-test="add-tab" onClick={this.handleAddTab}>
+            <button data-test="add-tab" onClick={this.handleAddTab} disabled={this.state.loading}>
               Add
-            </span>
+            </button>
           </TabList>
 
           {tabs.map(this.renderTabsContent)}
